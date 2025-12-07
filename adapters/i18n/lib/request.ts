@@ -36,20 +36,10 @@ export default getRequestConfig(async () => {
     const locale = store.get(COOKIE_NAMES.LOCALE)?.value;
 
     /**
-     * if no locale is set in cookies, return the default locale
-     */
-    if (!locale) {
-        return {
-            locale: DEFAULT_LOCALE,
-            messages: (await import(`@/public/locales/${DEFAULT_LOCALE}.json`))
-                .default,
-        };
-    }
-
-    /**
+     * if no locale is set in cookies or
      * if the locale from cookies is not supported, return the default locale
      */
-    if (!SUPPORTED_LOCALES.some((l) => l === locale)) {
+    if (!locale || (locale && !SUPPORTED_LOCALES.some((l) => l === locale))) {
         return {
             locale: DEFAULT_LOCALE,
             messages: (await import(`@/public/locales/${DEFAULT_LOCALE}.json`))

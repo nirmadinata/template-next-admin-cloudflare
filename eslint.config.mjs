@@ -1,4 +1,5 @@
 /* eslint-disable import/order */
+import pluginQuery from "@tanstack/eslint-plugin-query";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 import prettierConfig from "eslint-config-prettier";
@@ -10,6 +11,7 @@ import { defineConfig } from "eslint/config";
 import jsoncParser from "jsonc-eslint-parser";
 
 const eslintConfig = defineConfig([
+    ...pluginQuery.configs["flat/recommended"],
     {
         ignores: [
             "node_modules/**",

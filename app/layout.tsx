@@ -2,10 +2,11 @@ import "./globals.css";
 
 import { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
+import { ClientProvider } from "@/components/molecules/client-provider";
 import { DEFAULT_ROOT_METADATA } from "@/configs/constants";
 import { geistMono, geistSans } from "@/configs/fonts";
-import { cn } from "@/lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
     return DEFAULT_ROOT_METADATA;
@@ -17,13 +18,15 @@ type Props = Readonly<{
 
 export default function Layout({ children }: Props) {
     return (
-        <html lang="en">
+        <html>
             <body
-                className={cn(
-                    `${geistSans.variable} ${geistMono.variable} antialiased`
-                )}
+                className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
-                <NextIntlClientProvider>{children}</NextIntlClientProvider>
+                <NuqsAdapter>
+                    <NextIntlClientProvider>
+                        <ClientProvider>{children}</ClientProvider>
+                    </NextIntlClientProvider>
+                </NuqsAdapter>
             </body>
         </html>
     );
