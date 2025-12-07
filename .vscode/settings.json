@@ -1,0 +1,32 @@
+{
+    "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "tailwindCSS.codeActions": true,
+    "files.eol": "\n",
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "tailwindCSS.lint.suggestCanonicalClasses": "warning",
+    "files.associations": {
+        "wrangler.json": "jsonc",
+        "*.vars": "dotenv"
+    },
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit",
+        "source.organizeImports": "never",
+        "source.sortImports": "never"
+    },
+    "eslint.validate": [
+        "javascript",
+        "javascriptreact",
+        "typescript",
+        "typescriptreact",
+        "json",
+        "jsonc"
+    ],
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[jsonc]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
+}
