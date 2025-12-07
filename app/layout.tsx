@@ -1,6 +1,7 @@
 import "./globals.css";
 
 import { Metadata } from "next";
+import { NextIntlClientProvider } from "next-intl";
 
 import { DEFAULT_ROOT_METADATA } from "@/configs/constants";
 import { geistMono, geistSans } from "@/configs/fonts";
@@ -22,7 +23,7 @@ export default function Layout({ children }: Props) {
                     `${geistSans.variable} ${geistMono.variable} antialiased`
                 )}
             >
-                {children}
+                <NextIntlClientProvider>{children}</NextIntlClientProvider>
             </body>
         </html>
     );

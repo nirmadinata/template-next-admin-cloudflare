@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+import createNextIntlPlugin from "next-intl/plugin";
+
 const nextConfig: NextConfig = {
     /* config options here */
     images: {
@@ -8,4 +10,11 @@ const nextConfig: NextConfig = {
     },
 };
 
-export default nextConfig;
+const withNextIntl = createNextIntlPlugin(
+    // Specify a custom path here
+    {
+        requestConfig: "./adapters/i18n/lib/request.ts",
+    }
+);
+
+export default withNextIntl(nextConfig);
