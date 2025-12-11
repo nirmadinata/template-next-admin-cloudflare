@@ -1,10 +1,14 @@
 import { cookies } from "next/headers";
 
-import { Locale } from "next-intl";
 import { Formats } from "next-intl";
 import { getRequestConfig } from "next-intl/server";
 
-import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "@/adapters/i18n/constants";
+import {
+    DEFAULT_LOCALE,
+    LOCALE_TIMEZONE,
+    SUPPORTED_LOCALES,
+} from "@/adapters/i18n/constants";
+import { isLocale } from "@/adapters/i18n/lib/util";
 import { COOKIE_NAMES } from "@/configs/constants";
 
 export const formats = {
@@ -36,18 +40,20 @@ export default getRequestConfig(async () => {
      * if no locale is set in cookies or
      * if the locale from cookies is not supported, return the default locale
      */
-    if (!locale || (locale && !SUPPORTED_LOCALES.some((l) => l === locale))) {
+    if (!isLocale(SUPPORTED_LOCALES, locale)) {
+        const locale = DEFAULT_LOCALE;
         return {
-            locale: DEFAULT_LOCALE,
-            messages: (await import(`@/public/locales/${DEFAULT_LOCALE}.json`))
-                .default,
+            formats,
+            locale,
+            timeZone: LOCALE_TIMEZONE[locale],
+            messages: (await import(`@/public/locales/${locale}.json`)).default,
         };
     }
 
-    const l = locale as Locale;
-
     return {
-        locale: l,
-        messages: (await import(`@/public/locales/${l}.json`)).default,
+        formats,
+        locale,
+        timeZone: LOCALE_TIMEZONE[locale],
+        messages: (await import(`@/public/locales/${locale}.json`)).default,
     };
 });

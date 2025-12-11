@@ -13,9 +13,3 @@ const routing = defineRouting({
 
 export const { Link, redirect, usePathname, useRouter, getPathname } =
     createNavigation(routing);
-
-declare module "next-intl" {
-    interface AppConfig {
-        Locale: (typeof routing.locales)[number];
-    }
-}
