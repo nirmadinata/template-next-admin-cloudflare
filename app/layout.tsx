@@ -19,14 +19,15 @@ type Props = Readonly<{
 export default function Layout({ children }: Props) {
     return (
         <html>
+            <head>{/* Put favicon here */}</head>
             <body
                 className={`${geistSans.variable} ${geistMono.variable} antialiased`}
             >
-                <NuqsAdapter>
-                    <NextIntlClientProvider>
+                <NextIntlClientProvider>
+                    <NuqsAdapter>
                         <ClientProvider>{children}</ClientProvider>
-                    </NextIntlClientProvider>
-                </NuqsAdapter>
+                    </NuqsAdapter>
+                </NextIntlClientProvider>
             </body>
         </html>
     );

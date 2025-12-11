@@ -4,10 +4,7 @@ import { Locale } from "next-intl";
 import { Formats } from "next-intl";
 import { getRequestConfig } from "next-intl/server";
 
-import {
-    DEFAULT_LOCALE,
-    SUPPORTED_LOCALES,
-} from "@/adapters/i18n/lib/constants";
+import { DEFAULT_LOCALE, SUPPORTED_LOCALES } from "@/adapters/i18n/constants";
 import { COOKIE_NAMES } from "@/configs/constants";
 
 export const formats = {
