@@ -6,14 +6,15 @@
         "dev": "next dev --turbopack",
         "build": "next build --turbopack",
         "build-analyze": "ANALYZE=true next build",
-        "cf:build:production": "",
-        "cf:build:development": "",
-        "cf:typegen:development": "wrangler types -e development --env-interface CloudflareEnv ./cloudflare-env.d.ts",
-        "cf:typegen:production": "wrangler types -e production --env-interface CloudflareEnv ./cloudflare-env.d.ts",
-        "email:dev": "dev",
-        "start": "next start",
-        "lint": "eslint . --fix",
-        "format": "prettier --write ."
+        "email:dev": "email dev -d ./src/templates/emails",
+        "email:build": "email build -d ./src/templates/emails",
+        "lint": "eslint . --fix --cache",
+        "format": "prettier --write .",
+        "cf:typegen": "wrangler types -e development --env-interface CloudflareEnv ./cloudflare-env.d.ts",
+        "cf:build:production": "opennextjs-cloudflare build -e production",
+        "cf:build:development": "opennextjs-cloudflare build -e development",
+        "cf:deploy:production": "opennextjs-cloudflare deploy -e production",
+        "cf:deploy:development": "opennextjs-cloudflare deploy -e development"
     },
     "dependencies": {
         "@next/third-parties": "^16.0.10",

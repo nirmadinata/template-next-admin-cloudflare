@@ -26,6 +26,7 @@ const eslintConfig = defineConfig([
             ".eslintcache",
             "src/adapters/d1/migrations/meta/**",
             "src/adapters/public-api/typegen.ts",
+            "./.eslintcache",
         ],
     },
     ...nextVitals,

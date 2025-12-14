@@ -1,0 +1,59 @@
+{
+    "$schema": "node_modules/wrangler/config-schema.json",
+    "main": ".open-next/worker.js",
+    "name": "template",
+    "compatibility_date": "2025-11-17",
+    "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+    "assets": {
+        "directory": ".open-next/assets",
+        "binding": "ASSETS",
+    },
+    "env": {
+        "development": {
+            "vars": {
+                "BUN_VERSION": "1.3.4",
+            },
+            "kv_namespaces": [
+                {
+                    "binding": "MAIN_KV",
+                },
+            ],
+            "d1_databases": [
+                {
+                    "binding": "MAIN_DB",
+                    "migrations_dir": "./adapters/d1/migrations",
+                },
+            ],
+            "r2_buckets": [
+                {
+                    "binding": "MAIN_BUCKET",
+                    "remote": true,
+                },
+            ],
+        },
+        "production": {
+            "vars": {
+                "BUN_VERSION": "1.3.4",
+            },
+            "kv_namespaces": [
+                {
+                    "binding": "MAIN_KV",
+                    "remote": true,
+                },
+            ],
+            "d1_databases": [
+                {
+                    "binding": "MAIN_DB",
+                    "migrations_dir": "./adapters/d1/migrations",
+                    "remote": true,
+                },
+            ],
+            "r2_buckets": [
+                {
+                    "binding": "MAIN_BUCKET",
+                    "remote": true,
+                },
+            ],
+        },
+    },
+}
