@@ -27,7 +27,6 @@
             "r2_buckets": [
                 {
                     "binding": "MAIN_BUCKET",
-                    "remote": true,
                 },
             ],
         },

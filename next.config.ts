@@ -4,22 +4,29 @@ import nextBundleAnalyzer from "@next/bundle-analyzer";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 import createNextIntlPlugin from "next-intl/plugin";
 
+const env = process.env.NEXTJS_ENV;
+const isDevelopment = env === "development";
+const assetHostName = URL.parse(
+    process.env.NEXT_PUBLIC_ASSET_URL ?? ""
+)?.hostname;
+
 const nextConfig: NextConfig = {
     /**
      * make sure meta tags is not placed inside body tag
      */
     htmlLimitedBots: /.*/,
     images: {
+        loader: isDevelopment ? "default" : "default",
+        loaderFile: "./lib/image-loader.ts",
         formats: ["image/webp"],
         remotePatterns: [
-            {
+            assetHostName && {
                 /**
                  * Use hostname from environment variable NEXT_PUBLIC_ASSET_URL
                  */
-                hostname: new URL(process.env.NEXT_PUBLIC_ASSET_URL || "")
-                    .hostname,
+                hostname: assetHostName,
             },
-        ],
+        ].filter((v) => !!v),
     },
 };
 

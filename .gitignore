@@ -42,3 +42,4 @@ yarn-error.log*
 next-env.d.ts
 .eslintcache
 cloudflare-env.d.ts
+.wrangler
