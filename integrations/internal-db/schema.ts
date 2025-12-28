@@ -1,4 +1,4 @@
-import { relations } from "drizzle-orm";
+import { relations, sql } from "drizzle-orm";
 import {
     index,
     int,
@@ -8,33 +8,37 @@ import {
 } from "drizzle-orm/sqlite-core";
 
 import {
-    COMMON_COLUMN_ENUM,
-    USER_ROLE_DEFAULT,
-    TABLE_ENUM,
-    USER_COLUMN_ENUM,
-    USER_ROLE_LIST,
-    COMMON_AUTHORED_COLUMN_ENUM,
-    SESSION_COLUMN_ENUM,
     ACCOUNT_COLUMN_ENUM,
-    VERIFICATION_COLUMN_ENUM,
+    COMMON_AUTHORED_COLUMN_ENUM,
+    COMMON_COLUMN_ENUM,
+    INDEXES_ENUM,
     LOCALE_COLUMN_ENUM,
-    MEDIA_MIME_TYPE_COLUMN_ENUM,
     MEDIA_COLUMN_ENUM,
+    MEDIA_MIME_TYPE_COLUMN_ENUM,
+    MEDIA_TAGS_COLUMN_ENUM,
+    SESSION_COLUMN_ENUM,
+    TABLE_ENUM,
     TAGS_COLUMN_ENUM,
-} from "@/integrations/d1/constants";
+    USER_COLUMN_ENUM,
+    USER_ROLE_DEFAULT,
+    USER_ROLE_LIST,
+    VERIFICATION_COLUMN_ENUM,
+} from "@/integrations/internal-db/constants";
+
+const CURRENT_TIMESTAMP = sql`CURRENT_TIMESTAMP`;
 
 const COMMON_COLUMNS = {
     [COMMON_COLUMN_ENUM.CREATED_AT]: int({
         mode: "timestamp",
     })
         .notNull()
-        .$default(() => new Date()),
+        .default(CURRENT_TIMESTAMP),
     [COMMON_COLUMN_ENUM.UPDATED_AT]: int({
         mode: "timestamp",
     })
         .notNull()
-        .$default(() => new Date())
-        .$onUpdateFn(() => new Date()),
+        .default(CURRENT_TIMESTAMP)
+        .$onUpdate(() => CURRENT_TIMESTAMP),
 } as const;
 
 const COMMON_AUTHORED_COLUMNS = {
@@ -120,7 +124,7 @@ export const users = sqliteTable(
         /**
          * indexes
          */
-        index("idx_users_email").on(table[USER_COLUMN_ENUM.EMAIL]),
+        index(INDEXES_ENUM.USERS_EMAIL).on(table[USER_COLUMN_ENUM.EMAIL]),
     ]
 );
 export const sessions = sqliteTable(
@@ -138,7 +142,7 @@ export const sessions = sqliteTable(
          */
         [SESSION_COLUMN_ENUM.USER_ID]: text()
             .notNull()
-            .references(() => users.id, {
+            .references(() => users[COMMON_COLUMN_ENUM.ID], {
                 onDelete: "cascade",
             }),
 
@@ -163,8 +167,10 @@ export const sessions = sqliteTable(
         /**
          * indexes
          */
-        index("idx_sessions_user_id").on(table[SESSION_COLUMN_ENUM.USER_ID]),
-        index("idx_sessions_token").on(table[SESSION_COLUMN_ENUM.TOKEN]),
+        index(INDEXES_ENUM.SESSION_USER_ID).on(
+            table[SESSION_COLUMN_ENUM.USER_ID]
+        ),
+        index(INDEXES_ENUM.SESSION_TOKEN).on(table[SESSION_COLUMN_ENUM.TOKEN]),
     ]
 );
 export const accounts = sqliteTable(
@@ -182,7 +188,7 @@ export const accounts = sqliteTable(
          */
         [ACCOUNT_COLUMN_ENUM.USER_ID]: text()
             .notNull()
-            .references(() => users.id, {
+            .references(() => users[COMMON_COLUMN_ENUM.ID], {
                 onDelete: "cascade",
             }),
 
@@ -212,7 +218,9 @@ export const accounts = sqliteTable(
         /**
          * indexes
          */
-        index("idx_accounts_user_id").on(table[ACCOUNT_COLUMN_ENUM.USER_ID]),
+        index(INDEXES_ENUM.ACCOUNTS_USER_ID).on(
+            table[ACCOUNT_COLUMN_ENUM.USER_ID]
+        ),
     ]
 );
 export const verifications = sqliteTable(
@@ -243,7 +251,7 @@ export const verifications = sqliteTable(
         /**
          * indexes
          */
-        index("idx_verifications_identifier").on(
+        index(INDEXES_ENUM.VERIFICATIONS_IDENTIFIER).on(
             table[VERIFICATION_COLUMN_ENUM.IDENTIFIER]
         ),
     ]
@@ -274,8 +282,8 @@ export const tags = sqliteTable(
         /**
          * indexes
          */
-        index("idx_tags_name").on(table[TAGS_COLUMN_ENUM.NAME]),
-        index("idx_tags_slug").on(table[TAGS_COLUMN_ENUM.SLUG]),
+        index(INDEXES_ENUM.TAGS_NAME).on(table[TAGS_COLUMN_ENUM.NAME]),
+        index(INDEXES_ENUM.TAGS_SLUG).on(table[TAGS_COLUMN_ENUM.SLUG]),
     ]
 );
 
@@ -293,7 +301,9 @@ export const locales = sqliteTable(
             .unique(),
         [LOCALE_COLUMN_ENUM.NAME]: text({
             length: 50,
-        }).notNull(),
+        })
+            .notNull()
+            .unique(),
     },
 
     (table) => [
@@ -307,20 +317,20 @@ export const locales = sqliteTable(
         /**
          * indexes
          */
-        index("idx_locales_code").on(table[LOCALE_COLUMN_ENUM.CODE]),
-        index("idx_locales_name").on(table[LOCALE_COLUMN_ENUM.NAME]),
+        index(INDEXES_ENUM.LOCALES_CODE).on(table[LOCALE_COLUMN_ENUM.CODE]),
+        index(INDEXES_ENUM.LOCALES_NAME).on(table[LOCALE_COLUMN_ENUM.NAME]),
     ]
 );
 
-export const mediaMimeTypes = sqliteTable(
-    TABLE_ENUM.MEDIA_MIME_TYPES,
+export const mimeTypes = sqliteTable(
+    TABLE_ENUM.MIME_TYPES,
     {
         ...COMMON_COLUMNS,
         ...COMMON_AUTHORED_COLUMNS,
 
         [COMMON_COLUMN_ENUM.ID]: int(),
         [MEDIA_MIME_TYPE_COLUMN_ENUM.MIME_TYPE]: text().notNull().unique(),
-        [MEDIA_MIME_TYPE_COLUMN_ENUM.TITLE]: text(),
+        [MEDIA_MIME_TYPE_COLUMN_ENUM.TITLE]: text().notNull(),
         [MEDIA_MIME_TYPE_COLUMN_ENUM.DESCRIPTION]: text(),
     },
 
@@ -335,11 +345,12 @@ export const mediaMimeTypes = sqliteTable(
         /**
          * indexes
          */
-        index("idx_media_mime_types_mime_type").on(
+        index(INDEXES_ENUM.MIME_TYPES_MIME_TYPE).on(
             table[MEDIA_MIME_TYPE_COLUMN_ENUM.MIME_TYPE]
         ),
     ]
 );
+
 export const medias = sqliteTable(
     TABLE_ENUM.MEDIAS,
     {
@@ -353,20 +364,17 @@ export const medias = sqliteTable(
          */
         [MEDIA_COLUMN_ENUM.MEDIA_MIME_TYPE_ID]: int()
             .notNull()
-            .references(() => mediaMimeTypes.id, {
+            .references(() => mimeTypes[COMMON_COLUMN_ENUM.ID], {
                 onDelete: "cascade",
             }),
 
         /**
          * general fields
          */
-        [MEDIA_COLUMN_ENUM.NAME]: text(),
+        [MEDIA_COLUMN_ENUM.NAME]: text().notNull(),
         [MEDIA_COLUMN_ENUM.DESCRIPTION]: text(),
         [MEDIA_COLUMN_ENUM.STORAGE_KEY]: text().notNull().unique(),
         [MEDIA_COLUMN_ENUM.SIZE_IN_BYTES]: int().notNull(),
-        [MEDIA_COLUMN_ENUM.TAGS]: text({
-            mode: "json",
-        }),
 
         /**
          * image-kind specific fields
@@ -391,7 +399,38 @@ export const medias = sqliteTable(
         /**
          * indexes
          */
-        index("idx_medias_name").on(table[MEDIA_COLUMN_ENUM.NAME]),
+        index(INDEXES_ENUM.MEDIA_NAME).on(table[MEDIA_COLUMN_ENUM.NAME]),
+    ]
+);
+
+export const mediaTags = sqliteTable(
+    TABLE_ENUM.MEDIA_TAGS,
+    {
+        ...COMMON_COLUMNS,
+
+        [COMMON_COLUMN_ENUM.ID]: int(),
+        [MEDIA_TAGS_COLUMN_ENUM.MEDIA_ID]: int()
+            .notNull()
+            .references(() => medias[COMMON_COLUMN_ENUM.ID], {
+                onDelete: "cascade",
+            }),
+        [MEDIA_TAGS_COLUMN_ENUM.TAG_ID]: int()
+            .notNull()
+            .references(() => tags[COMMON_COLUMN_ENUM.ID], {
+                onDelete: "cascade",
+            }),
+    },
+    (table) => [
+        /**
+         * primary key
+         */
+        primaryKey({
+            columns: [table[COMMON_COLUMN_ENUM.ID]],
+        }),
+
+        /**
+         * indexes
+         */
     ]
 );
 
@@ -417,19 +456,33 @@ export const accountRelations = relations(accounts, ({ one }) => ({
     }),
 }));
 
-export const mediaMimeTypeRelations = relations(mediaMimeTypes, ({ many }) => ({
+export const verificationRelations = relations(verifications, (_) => ({}));
+
+export const mediaMimeTypeRelations = relations(mimeTypes, ({ many }) => ({
     medias: many(medias),
 }));
 
-export const mediaRelations = relations(medias, ({ one }) => ({
-    mediaMimeType: one(mediaMimeTypes, {
+export const mediaRelations = relations(medias, ({ one, many }) => ({
+    mediaMimeType: one(mimeTypes, {
         fields: [medias[MEDIA_COLUMN_ENUM.MEDIA_MIME_TYPE_ID]],
-        references: [mediaMimeTypes[COMMON_COLUMN_ENUM.ID]],
+        references: [mimeTypes[COMMON_COLUMN_ENUM.ID]],
     }),
+    mediaTags: many(mediaTags),
 }));
 
-export const localeRelations = relations(locales, ({}) => ({}));
+export const localeRelations = relations(locales, (_) => ({}));
 
-export const tagRelations = relations(tags, ({}) => ({}));
+export const tagRelations = relations(tags, ({ many }) => ({
+    mediaTags: many(mediaTags),
+}));
 
-export const tagsRelations = relations(tags, ({}) => ({}));
+export const mediaTagRelations = relations(mediaTags, ({ one }) => ({
+    media: one(medias, {
+        fields: [mediaTags[MEDIA_TAGS_COLUMN_ENUM.MEDIA_ID]],
+        references: [medias[COMMON_COLUMN_ENUM.ID]],
+    }),
+    tag: one(tags, {
+        fields: [mediaTags[MEDIA_TAGS_COLUMN_ENUM.TAG_ID]],
+        references: [tags[COMMON_COLUMN_ENUM.ID]],
+    }),
+}));

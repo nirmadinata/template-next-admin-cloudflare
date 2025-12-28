@@ -1,15 +1,19 @@
-import config from "dotenv";
+import { config } from "dotenv";
 import { defineConfig } from "drizzle-kit";
-import path from "node:path";
 import process from "node:process";
 
-config.config({
-    path: path.resolve(process.cwd(), ".env.development"),
-});
+let path = "";
+if (process.env.NODE_ENV === "production") {
+    path = ".env.production";
+} else if (process.env.NODE_ENV === "development") {
+    path = ".env.local";
+}
+
+config({ path });
 
 export default defineConfig({
-    out: "./integrations/d1/migrations",
-    schema: "./integrations/d1/schema.ts",
+    out: "./integrations/internal-db/migrations",
+    schema: "./integrations/internal-db/schema.ts",
     dialect: "sqlite",
     driver: "d1-http",
     dbCredentials: {

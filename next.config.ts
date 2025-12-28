@@ -5,7 +5,7 @@ import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
 import createNextIntlPlugin from "next-intl/plugin";
 
 const env = process.env.NEXTJS_ENV;
-const isDevelopment = env === "development";
+const isLocal = env === "local";
 const assetHostName = URL.parse(
     process.env.NEXT_PUBLIC_ASSET_URL ?? ""
 )?.hostname;
@@ -16,7 +16,7 @@ const nextConfig: NextConfig = {
      */
     htmlLimitedBots: /.*/,
     images: {
-        loader: isDevelopment ? "default" : "default",
+        loader: isLocal ? "default" : "default",
         loaderFile: "./lib/image-loader.ts",
         formats: ["image/webp"],
         remotePatterns: [
@@ -44,5 +44,5 @@ export default withBundleAnalyzer(withNextIntl(nextConfig));
  * Initialize OpenNext Cloudflare for development environment.
  */
 initOpenNextCloudflareForDev({
-    environment: process.env.NEXTJS_ENV,
+    environment: env,
 });
