@@ -1,7 +1,6 @@
-import { cn as _cn } from "@sglara/cn";
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
-type ClassValue = Parameters<typeof _cn>[number];
-
-export function cn(...classes: ClassValue[]) {
-    return _cn(...classes);
+export function cn(...inputs: ClassValue[]) {
+    return twMerge(clsx(inputs));
 }
