@@ -10,6 +10,7 @@ This is a Next.js 15 application designed to run on **Cloudflare Workers** using
 - **better-auth** for authentication with admin plugin
 - **next-intl** for internationalization (English/Arabic)
 - **TanStack Query** and **TanStack Form** for data fetching and forms
+- **ORPC** for type-safe REST APIs with OpenAPI support
 
 ## Critical Patterns
 
@@ -43,6 +44,28 @@ const db = getInternalDB(env.INTERNAL_DB); // env from getCFContext()
 - Schema uses `snake_case` casing automatically via Drizzle config
 - All tables include `created_at` and `updated_at` timestamps with auto-update
 - Author tracking uses `created_by`/`updated_by` referencing users table
+
+### REST API Pattern (ORPC)
+
+All APIs use ORPC for type-safe endpoints:
+
+```typescript
+// Server-side (in server components, actions)
+import { serverApiClient } from "@/integrations/rest/server-client";
+const data = await serverApiClient.visitor.home.getHomePageData();
+
+// Client-side (with TanStack Query)
+import { orpc } from "@/integrations/rest/client-client";
+const { data } = useQuery(orpc.visitor.home.getHomePageData.queryOptions());
+```
+
+**Creating new API procedures:**
+
+1. Define Zod schemas in `features/<feature>/server/schemas.ts`
+2. Create procedures in `features/<feature>/server/procedures.ts`
+3. Export router from `features/<feature>/server/router.ts`
+4. Register in `integrations/rest/router.ts`
+5. Create API route in `app/api/<domain>/[...path]/route.ts`
 
 ### Authentication Integration
 
@@ -131,16 +154,35 @@ UI components in [components/ui/](components/ui/) use:
 
 ### Folder Organization
 
-- `integrations/` - External service wrappers (auth, db, kv, i18n)
-- `features/` - Feature-specific code (not shared across app)
+- `integrations/` - External service wrappers (auth, db, kv, i18n, rest)
+- `features/` - Feature-specific code with atomic design structure
 - `components/ui/` - Reusable UI primitives
 - `components/molecules/` - Composite client components
 - `components/templates/` - Email templates
 - `app/(admin)/` - Route group for admin pages (shares layout)
 
+### Feature Structure (Atomic Design)
+
+Each feature in `features/` follows this structure:
+
+```
+features/<feature>/
+├── components/
+│   ├── atoms/       # Basic elements (Heading, Text, Icon)
+│   ├── molecules/   # Simple groups (Cards, Items)
+│   ├── organisms/   # Complex sections
+│   └── templates/   # Full page layouts
+├── server/
+│   ├── schemas.ts   # Zod schemas
+│   ├── procedures.ts # ORPC procedures
+│   └── router.ts    # Feature router
+└── AGENTS.md        # Feature-specific AI instructions
+```
+
 ### API Routes
 
-- Located in `app/api/<domain>/`
+- Located in `app/api/<domain>/[...path]/route.ts`
+- Use `createApiHandler` from `@/integrations/rest`
 - Auth routes use `toNextJsHandler` from better-auth
 - Always pass CloudflareEnv to integration functions
 
@@ -160,6 +202,7 @@ UI components in [components/ui/](components/ui/) use:
 
 ### External Dependencies
 
+- **ORPC**: Type-safe APIs in `integrations/rest/`, feature routers in `features/*/server/`
 - **better-auth**: All auth logic centralized in `integrations/internal-auth/`
 - **Drizzle**: Database schema is source of truth, migrations auto-generated
 - **next-intl**: Wrapped in `integrations/i18n/` for custom locale logic
@@ -171,3 +214,4 @@ UI components in [components/ui/](components/ui/) use:
 3. **Migrations require environment variables** - ensure `.env.local` / `.env.production` exist with Cloudflare credentials
 4. **Admin routes require authentication** - check session in layout or middleware
 5. **Locale changes need server action** - client can't set cookies directly
+6. **Use server client for SSR** - `serverApiClient` for server components, `orpc` for client components

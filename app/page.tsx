@@ -1,8 +1,14 @@
+import { HomePageTemplate } from "@/features/visitor-home/components";
+import { serverApiClient } from "@/integrations/rest/server-client";
+
+/**
+ * Home Page
+ *
+ * Server-rendered home page using the server API client.
+ * Data is fetched at request time (SSR).
+ */
 export default async function Page() {
-    return (
-        <div className="flex flex-col gap-y-4">
-            <h1>Welcome to the Home Page</h1>
-            <button>Hello Wello</button>
-        </div>
-    );
+    const data = await serverApiClient.visitor.home.getHomePageData();
+
+    return <HomePageTemplate data={data} />;
 }
