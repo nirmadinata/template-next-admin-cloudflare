@@ -45,27 +45,47 @@ const db = getInternalDB(env.INTERNAL_DB); // env from getCFContext()
 - All tables include `created_at` and `updated_at` timestamps with auto-update
 - Author tracking uses `created_by`/`updated_by` referencing users table
 
-### REST API Pattern (ORPC)
+### API Pattern (ORPC)
 
-All APIs use ORPC for type-safe endpoints:
+APIs are organized into two features:
+
+**Visitor API** (`features/visitor-api`) - Public OpenAPI endpoints:
 
 ```typescript
 // Server-side (in server components, actions)
-import { serverApiClient } from "@/integrations/rest/server-client";
-const data = await serverApiClient.visitor.home.getHomePageData();
+import { serverVisitorApiClient } from "@/features/visitor-api";
+const data = await serverVisitorApiClient.home.getHomePageData();
 
 // Client-side (with TanStack Query)
-import { orpc } from "@/integrations/rest/client-client";
-const { data } = useQuery(orpc.visitor.home.getHomePageData.queryOptions());
+import { visitorOrpc } from "@/features/visitor-api";
+const { data } = useQuery(visitorOrpc.home.getHomePageData.queryOptions());
 ```
 
-**Creating new API procedures:**
+**RPC** (`features/rpc`) - Internal admin/dashboard endpoints:
+
+```typescript
+// Server-side (in server components, actions)
+import { serverRpcClient } from "@/features/rpc";
+const users = await serverRpcClient.users.list();
+
+// Client-side (with TanStack Query)
+import { adminOrpc } from "@/features/rpc";
+const { data } = useQuery(adminOrpc.users.list.queryOptions());
+```
+
+**Creating new visitor API procedures:**
 
 1. Define Zod schemas in `features/<feature>/server/schemas.ts`
-2. Create procedures in `features/<feature>/server/procedures.ts`
+2. Create procedures using `publicProcedure` from `@/features/visitor-api`
 3. Export router from `features/<feature>/server/router.ts`
-4. Register in `integrations/rest/router.ts`
-5. Create API route in `app/api/<domain>/[...path]/route.ts`
+4. Register in `features/visitor-api/router.ts`
+
+**Creating new admin RPC procedures:**
+
+1. Define Zod schemas in `features/<feature>/server/schemas.ts`
+2. Create procedures using `authProcedure` or `adminProcedure` from `@/features/rpc`
+3. Export router from `features/<feature>/server/router.ts`
+4. Register in `features/rpc/router.ts`
 
 ### Authentication Integration
 
@@ -112,28 +132,28 @@ Two environments: `local` and `production`
 
 ```bash
 # Development
-npm run dev                           # Next.js dev with Turbopack
+bun run dev                           # Next.js dev with Turbopack
 
 # Database migrations
-npm run internal:generate             # Generate migrations from schema
-npm run internal:migrate:local        # Apply to local D1
-npm run internal:migrate:production   # Apply to production D1
-npm run internal:studio:local         # Drizzle Studio UI
+bun run internal:generate             # Generate migrations from schema
+bun run internal:migrate:local        # Apply to local D1
+bun run internal:migrate:production   # Apply to production D1
+bun run internal:studio:local         # Drizzle Studio UI
 
 # Cloudflare deployment
-npm run cf:typegen                    # Generate CloudflareEnv types
-npm run cf:build:local                # Build for local/preview
-npm run cf:deploy:production          # Deploy to production
+bun run cf:typegen                    # Generate CloudflareEnv types
+bun run cf:build:local                # Build for local/preview
+bun run cf:deploy:production          # Deploy to production
 
 # Email templates (React Email)
-npm run email:dev                     # Preview emails
+bun run email:dev                     # Preview emails
 ```
 
 ### Database Schema Changes
 
 1. Edit [integrations/internal-db/schema.ts](integrations/internal-db/schema.ts)
-2. Run `npm run internal:generate` to create migration
-3. Apply with `npm run internal:migrate:local` or `:production`
+2. Run `bun run internal:generate` to create migration
+3. Apply with `bun run internal:migrate:local` or `:production`
 4. Never edit generated SQL directly
 
 ### Adding UI Components
@@ -181,14 +201,14 @@ features/<feature>/
 
 ### API Routes
 
-- Located in `app/api/<domain>/[...path]/route.ts`
-- Use `createApiHandler` from `@/integrations/rest`
+- Visitor API at `app/api/visitor/[[...path]]/route.ts` using `createVisitorApiHandler` from `@/features/visitor-api`
+- Admin RPC at `app/api/admin/[[...path]]/route.ts` using `createRpcHandler` from `@/features/rpc`
 - Auth routes use `toNextJsHandler` from better-auth
 - Always pass CloudflareEnv to integration functions
 
 ### Type Safety
 
-- CloudflareEnv types auto-generated via `npm run cf:typegen`
+- CloudflareEnv types auto-generated via `bun run cf:typegen`
 - Drizzle schema exports types directly: `import { users } from "@/integrations/internal-db/schema"`
 - Use Zod schemas from `drizzle-zod` for validation
 
@@ -202,7 +222,7 @@ features/<feature>/
 
 ### External Dependencies
 
-- **ORPC**: Type-safe APIs in `integrations/rest/`, feature routers in `features/*/server/`
+- **ORPC**: Type-safe APIs in `features/visitor-api/` and `features/rpc/`, feature routers in `features/*/server/`
 - **better-auth**: All auth logic centralized in `integrations/internal-auth/`
 - **Drizzle**: Database schema is source of truth, migrations auto-generated
 - **next-intl**: Wrapped in `integrations/i18n/` for custom locale logic
@@ -214,4 +234,4 @@ features/<feature>/
 3. **Migrations require environment variables** - ensure `.env.local` / `.env.production` exist with Cloudflare credentials
 4. **Admin routes require authentication** - check session in layout or middleware
 5. **Locale changes need server action** - client can't set cookies directly
-6. **Use server client for SSR** - `serverApiClient` for server components, `orpc` for client components
+6. **Use server client for SSR** - `serverVisitorApiClient` for server components, `visitorOrpc` for client components

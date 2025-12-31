@@ -1,12 +1,12 @@
-import { createApiHandler } from "@/integrations/rest";
+import { createVisitorApiHandler } from "@/features/visitor-api";
 
 /**
  * Visitor API Route Handler
  *
- * Handles all visitor-related API endpoints via ORPC.
+ * Handles all visitor-related API endpoints via ORPC OpenAPI.
  * Prefix: /api/visitor
  */
-const handler = createApiHandler();
+const handler = createVisitorApiHandler();
 
 export const GET = handler;
 export const POST = handler;

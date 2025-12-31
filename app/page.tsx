@@ -1,5 +1,5 @@
+import { serverVisitorApiClient } from "@/features/visitor-api";
 import { HomePageTemplate } from "@/features/visitor-home/components";
-import { serverApiClient } from "@/integrations/rest/server-client";
 
 /**
  * Home Page
@@ -8,7 +8,7 @@ import { serverApiClient } from "@/integrations/rest/server-client";
  * Data is fetched at request time (SSR).
  */
 export default async function Page() {
-    const data = await serverApiClient.visitor.home.getHomePageData();
+    const data = await serverVisitorApiClient.home.getHomePageData();
 
     return <HomePageTemplate data={data} />;
 }

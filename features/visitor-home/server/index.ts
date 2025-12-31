@@ -4,7 +4,7 @@
  * Exports all server-side functionality for the visitor home feature.
  */
 
-export { visitorRouter } from "./router";
+export { homeRouter as visitorRouter } from "./router";
 export type { VisitorHomeRouter as VisitorRouter } from "./router";
 
 export {

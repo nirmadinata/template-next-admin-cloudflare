@@ -9,7 +9,7 @@ import {
     StatsSection,
     TestimonialsCarouselSection,
 } from "@/features/visitor-home/components/organisms";
-import { orpc } from "@/integrations/rest/client-client";
+import { visitorOrpc } from "@/features/visitor-api";
 
 /**
  * Client-Side Home Page Content
@@ -19,7 +19,7 @@ import { orpc } from "@/integrations/rest/client-client";
  */
 export function ClientHomeContent() {
     const { data, isLoading, isError, error } = useQuery(
-        orpc.visitor.home.getHomePageData.queryOptions()
+        visitorOrpc.home.getHomePageData.queryOptions()
     );
 
     if (isLoading) {

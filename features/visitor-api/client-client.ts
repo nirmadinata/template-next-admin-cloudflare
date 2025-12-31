@@ -1,6 +1,5 @@
 "use client";
 
-import type { AppRouter } from "./router";
 import type { ContractRouterClient } from "@orpc/contract";
 import type { JsonifiedClient } from "@orpc/openapi-client";
 
@@ -8,13 +7,15 @@ import { createORPCClient, onError } from "@orpc/client";
 import { OpenAPILink } from "@orpc/openapi-client/fetch";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 
+import { visitorApiRouter, type VisitorApiRouter } from "./router";
+
 /**
  * OpenAPI Link for client-side requests
  *
  * Uses fetch-based HTTP calls to the API endpoints.
  */
-const link = new OpenAPILink<object>(
-    {} as AppRouter, // Contract for type inference
+const link = new OpenAPILink(
+    visitorApiRouter, // Contract for type inference
     {
         url: () => {
             if (typeof window === "undefined") {
@@ -22,42 +23,43 @@ const link = new OpenAPILink<object>(
                     "Client API client is not allowed on the server side."
                 );
             }
-            return `${window.location.origin}/api`;
+            return `${window.location.origin}/api/visitor`;
         },
         interceptors: [
             onError((error) => {
-                console.error("[Client API Error]", error);
+                console.error("[Visitor API Client Error]", error);
             }),
         ],
     }
 );
 
 /**
- * Client-side API client
+ * Client-side Visitor API client
  *
  * Use this client for client components with fetch-based HTTP calls.
  *
  * @example
  * ```ts
- * import { clientApiClient } from "@/integrations/rest";
+ * import { clientVisitorApiClient } from "@/features/visitor-api";
  *
- * const data = await clientApiClient.visitor.home.getHeroSection();
+ * const data = await clientVisitorApiClient.home.getHeroSection();
  * ```
  */
-export const clientApiClient: JsonifiedClient<ContractRouterClient<AppRouter>> =
-    createORPCClient(link);
+export const clientVisitorApiClient: JsonifiedClient<
+    ContractRouterClient<VisitorApiRouter>
+> = createORPCClient(link);
 
 /**
- * TanStack Query utilities for ORPC
+ * TanStack Query utilities for Visitor API
  *
  * Use this for React Query integration with type-safe queries and mutations.
  *
  * @example
  * ```tsx
- * import { orpc } from "@/integrations/rest";
+ * import { visitorOrpc } from "@/features/visitor-api";
  * import { useQuery } from "@tanstack/react-query";
  *
- * const { data } = useQuery(orpc.visitor.home.getHeroSection.queryOptions());
+ * const { data } = useQuery(visitorOrpc.home.getHeroSection.queryOptions());
  * ```
  */
-export const orpc = createTanstackQueryUtils(clientApiClient);
+export const visitorOrpc = createTanstackQueryUtils(clientVisitorApiClient);

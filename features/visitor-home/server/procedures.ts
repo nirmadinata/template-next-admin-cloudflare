@@ -12,7 +12,7 @@ import {
     StatsSectionSchema,
     TestimonialsSectionSchema,
 } from "./schemas";
-import { publicProcedure } from "@/integrations/rest/base";
+import { publicProcedure } from "@/features/visitor-api";
 
 /**
  * Get Hero Section

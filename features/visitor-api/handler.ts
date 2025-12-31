@@ -3,30 +3,30 @@ import { OpenAPIReferencePlugin } from "@orpc/openapi/plugins";
 import { onError } from "@orpc/server";
 import { ZodToJsonSchemaConverter } from "@orpc/zod";
 
-import { appRouter } from "./router";
+import { visitorApiRouter } from "./router";
 
 /**
  * Create OpenAPI handler for Next.js API routes
  *
- * @param prefix - API route prefix (e.g., "/api/visitor")
  * @returns Handler function for Next.js route
  */
-export function createApiHandler() {
-    const handler = new OpenAPIHandler(appRouter, {
+export function createVisitorApiHandler() {
+    const handler = new OpenAPIHandler(visitorApiRouter, {
         plugins: [
             new OpenAPIReferencePlugin({
                 schemaConverters: [new ZodToJsonSchemaConverter()],
                 specGenerateOptions: {
                     info: {
-                        title: "Template APIII",
+                        title: "Visitor API",
                         version: "0.1.0",
+                        description: "Public-facing API endpoints for visitors",
                     },
                 },
             }),
         ],
         interceptors: [
             onError((error) => {
-                console.error("[API Error]", error);
+                console.error("[Visitor API Error]", error);
             }),
         ],
     });

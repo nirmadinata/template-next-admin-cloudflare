@@ -1,12 +1,20 @@
 /**
- * REST API Integration
+ * REST API Integration (Legacy Re-exports)
  *
- * This module provides ORPC-based REST API infrastructure.
- * - Server: OpenAPI handler for Next.js API routes
- * - Client: Type-safe clients for both server and client side
+ * @deprecated Use `@/features/visitor-api` for visitor endpoints
+ * @deprecated Use `@/features/rpc` for admin/dashboard endpoints
+ *
+ * This module re-exports from the new feature-based structure
+ * for backward compatibility.
  */
 
-export { createApiHandler } from "./handler";
-export { serverApiClient } from "./server-client";
-export { clientApiClient, orpc } from "./client-client";
-export type { AppRouter } from "./router";
+// Re-export from visitor-api feature
+export {
+    createVisitorApiHandler as createApiHandler,
+    serverVisitorApiClient as serverApiClient,
+    clientVisitorApiClient as clientApiClient,
+    visitorOrpc as orpc,
+    publicProcedure,
+} from "@/features/visitor-api";
+
+export type { VisitorApiRouter as AppRouter } from "@/features/visitor-api";

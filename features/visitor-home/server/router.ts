@@ -12,14 +12,12 @@ import {
  * Handles all public-facing home page API endpoints.
  * All procedures in this router are public (no auth required).
  */
-export const visitorRouter = {
-    home: {
-        getHeroSection,
-        getFeaturesSection,
-        getTestimonialsSection,
-        getStatsSection,
-        getHomePageData,
-    },
+export const homeRouter = {
+    getHeroSection,
+    getFeaturesSection,
+    getTestimonialsSection,
+    getStatsSection,
+    getHomePageData,
 };
 
-export type VisitorHomeRouter = typeof visitorRouter;
+export type VisitorHomeRouter = typeof homeRouter;
