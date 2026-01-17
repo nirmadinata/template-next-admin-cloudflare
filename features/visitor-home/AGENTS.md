@@ -29,9 +29,10 @@ All types exported from schemas use the `Type` suffix:
 ### Adding a New Section
 1. Create schema in `server/schemas.ts` with `Type` suffix for exports
 2. Add mock data in `server/mock-data.ts`
-3. Create procedure in `server/procedures.ts`
+3. Create procedure in `server/procedures.ts` using `publicProcedure` from `@/integrations/rpc`
 4. Export from `server/router.ts`
-5. Create components following atomic design
+5. Register router in `integrations/rpc/router.ts`
+6. Create components following atomic design
 
 ### Component Hierarchy
 - **Atoms**: Pure presentational, no business logic
@@ -48,7 +49,6 @@ Some molecules/organisms are client components (`"use client"`):
 
 ### API Pattern
 All procedures use ORPC with:
-- `.route()` for OpenAPI metadata (method, path, tags)
 - `.output()` for response schema validation
 - `.handler()` for business logic
 
@@ -57,15 +57,19 @@ All procedures use ORPC with:
 ### Server-Side Rendering (SSR)
 ```tsx
 // app/page.tsx
-const data = await serverApiClient.visitor.home.getHomePageData();
+import { serverRpc } from "@/integrations/rpc/server";
+
+const data = await serverRpc.home.getHomePageData();
 return <HomePageTemplate data={data} />;
 ```
 
 ### Client-Side Rendering (CSR)
 ```tsx
 // features/visitor-home/components/templates/client-home-content.tsx
+import { orpc } from "@/integrations/rpc/client";
+
 const { data, isLoading } = useQuery(
-    orpc.visitor.home.getHomePageData.queryOptions()
+    orpc.home.getHomePageData.queryOptions()
 );
 ```
 

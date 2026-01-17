@@ -3,7 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { Skeleton } from "@/components/ui/skeleton";
-import { visitorOrpc } from "@/features/visitor-api";
+import { orpc } from "@/integrations/rpc/client";
 import {
     FeaturesSection,
     HeroSection,
@@ -19,7 +19,7 @@ import {
  */
 export function ClientHomeContent() {
     const { data, isLoading, isError, error } = useQuery(
-        visitorOrpc.home.getHomePageData.queryOptions()
+        orpc.home.getHomePageData.queryOptions()
     );
 
     if (isLoading) {

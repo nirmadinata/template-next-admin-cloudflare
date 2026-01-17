@@ -12,7 +12,7 @@ import {
     StatsSectionSchema,
     TestimonialsSectionSchema,
 } from "./schemas";
-import { publicProcedure } from "@/features/visitor-api";
+import { publicProcedure } from "@/integrations/rpc";
 
 /**
  * Get Hero Section
@@ -20,13 +20,6 @@ import { publicProcedure } from "@/features/visitor-api";
  * Returns the hero section data for the home page.
  */
 export const getHeroSection = publicProcedure
-    .route({
-        method: "GET",
-        path: "/home/hero",
-        summary: "Get hero section",
-        description: "Returns the hero section data for the home page",
-        tags: ["visitor", "home"],
-    })
     .output(HeroSectionSchema)
     .handler(async () => {
         // Simulate async data fetching
@@ -40,13 +33,6 @@ export const getHeroSection = publicProcedure
  * Returns the features section data for the home page.
  */
 export const getFeaturesSection = publicProcedure
-    .route({
-        method: "GET",
-        path: "/home/features",
-        summary: "Get features section",
-        description: "Returns the features section data for the home page",
-        tags: ["visitor", "home"],
-    })
     .output(FeaturesSectionSchema)
     .handler(async () => {
         await new Promise((resolve) => setTimeout(resolve, 100));
@@ -59,13 +45,6 @@ export const getFeaturesSection = publicProcedure
  * Returns the testimonials section data for the home page.
  */
 export const getTestimonialsSection = publicProcedure
-    .route({
-        method: "GET",
-        path: "/home/testimonials",
-        summary: "Get testimonials section",
-        description: "Returns the testimonials section data for the home page",
-        tags: ["visitor", "home"],
-    })
     .output(TestimonialsSectionSchema)
     .handler(async () => {
         await new Promise((resolve) => setTimeout(resolve, 100));
@@ -78,13 +57,6 @@ export const getTestimonialsSection = publicProcedure
  * Returns the stats section data for the home page.
  */
 export const getStatsSection = publicProcedure
-    .route({
-        method: "GET",
-        path: "/home/stats",
-        summary: "Get stats section",
-        description: "Returns the stats section data for the home page",
-        tags: ["visitor", "home"],
-    })
     .output(StatsSectionSchema)
     .handler(async () => {
         await new Promise((resolve) => setTimeout(resolve, 100));
@@ -98,13 +70,6 @@ export const getStatsSection = publicProcedure
  * Useful for initial page load.
  */
 export const getHomePageData = publicProcedure
-    .route({
-        method: "GET",
-        path: "/home",
-        summary: "Get all home page data",
-        description: "Returns all sections for the home page",
-        tags: ["visitor", "home"],
-    })
     .output(HomePageDataSchema)
     .handler(async () => {
         await new Promise((resolve) => setTimeout(resolve, 100));

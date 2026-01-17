@@ -10,7 +10,7 @@ This is a Next.js 15 application designed to run on **Cloudflare Workers** using
 - **better-auth** for authentication with admin plugin
 - **next-intl** for internationalization (English/Arabic)
 - **TanStack Query** and **TanStack Form** for data fetching and forms
-- **ORPC** for type-safe REST APIs with OpenAPI support
+- **ORPC** for type-safe RPC APIs
 
 ## Critical Patterns
 
@@ -47,45 +47,24 @@ const db = getInternalDB(env.INTERNAL_DB); // env from getCFContext()
 
 ### API Pattern (ORPC)
 
-APIs are organized into two features:
-
-**Visitor API** (`features/visitor-api`) - Public OpenAPI endpoints:
+All APIs use a unified RPC pattern via `@/integrations/rpc`:
 
 ```typescript
 // Server-side (in server components, actions)
-import { serverVisitorApiClient } from "@/features/visitor-api";
-const data = await serverVisitorApiClient.home.getHomePageData();
+import { serverRpc } from "@/integrations/rpc/server";
+const data = await serverRpc.home.getHomePageData();
 
 // Client-side (with TanStack Query)
-import { visitorOrpc } from "@/features/visitor-api";
-const { data } = useQuery(visitorOrpc.home.getHomePageData.queryOptions());
+import { orpc } from "@/integrations/rpc/client";
+const { data } = useQuery(orpc.home.getHomePageData.queryOptions());
 ```
 
-**RPC** (`features/rpc`) - Internal admin/dashboard endpoints:
-
-```typescript
-// Server-side (in server components, actions)
-import { serverRpcClient } from "@/features/rpc";
-const users = await serverRpcClient.users.list();
-
-// Client-side (with TanStack Query)
-import { adminOrpc } from "@/features/rpc";
-const { data } = useQuery(adminOrpc.users.list.queryOptions());
-```
-
-**Creating new visitor API procedures:**
+**Creating new RPC procedures:**
 
 1. Define Zod schemas in `features/<feature>/server/schemas.ts`
-2. Create procedures using `publicProcedure` from `@/features/visitor-api`
+2. Create procedures using `publicProcedure`, `authProcedure`, or `adminProcedure` from `@/integrations/rpc`
 3. Export router from `features/<feature>/server/router.ts`
-4. Register in `features/visitor-api/router.ts`
-
-**Creating new admin RPC procedures:**
-
-1. Define Zod schemas in `features/<feature>/server/schemas.ts`
-2. Create procedures using `authProcedure` or `adminProcedure` from `@/features/rpc`
-3. Export router from `features/<feature>/server/router.ts`
-4. Register in `features/rpc/router.ts`
+4. Register in `integrations/rpc/router.ts`
 
 ### Authentication Integration
 
@@ -201,8 +180,7 @@ features/<feature>/
 
 ### API Routes
 
-- Visitor API at `app/api/visitor/[[...path]]/route.ts` using `createVisitorApiHandler` from `@/features/visitor-api`
-- Admin RPC at `app/api/admin/[[...path]]/route.ts` using `createRpcHandler` from `@/features/rpc`
+- RPC at `app/api/rpc/[[...path]]/route.ts` using `createRpcHandler` from `@/integrations/rpc`
 - Auth routes use `toNextJsHandler` from better-auth
 - Always pass CloudflareEnv to integration functions
 
@@ -222,7 +200,7 @@ features/<feature>/
 
 ### External Dependencies
 
-- **ORPC**: Type-safe APIs in `features/visitor-api/` and `features/rpc/`, feature routers in `features/*/server/`
+- **ORPC**: Type-safe RPC APIs in `integrations/rpc/`, feature routers in `features/*/server/`
 - **better-auth**: All auth logic centralized in `integrations/internal-auth/`
 - **Drizzle**: Database schema is source of truth, migrations auto-generated
 - **next-intl**: Wrapped in `integrations/i18n/` for custom locale logic
@@ -234,4 +212,4 @@ features/<feature>/
 3. **Migrations require environment variables** - ensure `.env.local` / `.env.production` exist with Cloudflare credentials
 4. **Admin routes require authentication** - check session in layout or middleware
 5. **Locale changes need server action** - client can't set cookies directly
-6. **Use server client for SSR** - `serverVisitorApiClient` for server components, `visitorOrpc` for client components
+6. **Use correct RPC imports** - `@/integrations/rpc/server` for server components, `@/integrations/rpc/client` for client components

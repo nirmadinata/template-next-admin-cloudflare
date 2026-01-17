@@ -1,6 +1,7 @@
 "use client";
 
-import type { RpcRouter } from "./router";
+import type { AppRouter } from "./router";
+import type { RouterClient } from "@orpc/server";
 
 import { createORPCClient, onError } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
@@ -9,49 +10,49 @@ import { createTanstackQueryUtils } from "@orpc/tanstack-query";
 /**
  * RPC Link for client-side requests
  *
- * Uses fetch-based HTTP calls to the admin RPC endpoints.
+ * Uses fetch-based HTTP calls to the RPC endpoints.
  */
-const link = new RPCLink<RpcRouter>({
+const link = new RPCLink({
     url: () => {
         if (typeof window === "undefined") {
             throw new Error(
                 "Client RPC client is not allowed on the server side."
             );
         }
-        return `${window.location.origin}/api/admin`;
+        return `${window.location.origin}/api/rpc`;
     },
     interceptors: [
         onError((error) => {
-            console.error("[Admin RPC Client Error]", error);
+            console.error("[RPC Client Error]", error);
         }),
     ],
 });
 
 /**
- * Client-side RPC client for Admin/Dashboard
+ * Client-side RPC client
  *
  * Use this client for client components with fetch-based HTTP calls.
  *
  * @example
  * ```ts
- * import { clientRpcClient } from "@/features/rpc";
+ * import { clientRpc } from "@/integrations/rpc";
  *
- * const users = await clientRpcClient.users.list();
+ * const data = await clientRpc.home.getHomePageData();
  * ```
  */
-export const clientRpcClient = createORPCClient<RpcRouter>(link);
+export const clientRpc: RouterClient<AppRouter> = createORPCClient(link);
 
 /**
- * TanStack Query utilities for Admin RPC
+ * TanStack Query utilities for RPC
  *
  * Use this for React Query integration with type-safe queries and mutations.
  *
  * @example
  * ```tsx
- * import { adminOrpc } from "@/features/rpc";
+ * import { orpc } from "@/integrations/rpc";
  * import { useQuery } from "@tanstack/react-query";
  *
- * const { data } = useQuery(adminOrpc.users.list.queryOptions());
+ * const { data } = useQuery(orpc.home.getHomePageData.queryOptions());
  * ```
  */
-export const adminOrpc = createTanstackQueryUtils(clientRpcClient);
+export const orpc = createTanstackQueryUtils(clientRpc);

@@ -2,21 +2,21 @@ import "server-only";
 
 import { createRouterClient } from "@orpc/server";
 
-import { rpcRouter } from "./router";
+import { appRouter } from "./router";
 
 /**
- * Server-side RPC client for Admin/Dashboard
+ * Server-side RPC client
  *
  * Use this client for server components, server actions, and API routes.
  * Calls procedures directly without HTTP overhead.
  *
  * @example
  * ```ts
- * import { serverRpcClient } from "@/features/rpc";
+ * import { serverRpc } from "@/integrations/rpc";
  *
- * const users = await serverRpcClient.users.list();
+ * const data = await serverRpc.home.getHomePageData();
  * ```
  */
-export const serverRpcClient = createRouterClient(rpcRouter, {
+export const serverRpc = createRouterClient(appRouter, {
     context: {},
 });

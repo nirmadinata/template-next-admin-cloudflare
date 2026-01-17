@@ -1,27 +1,27 @@
 import { onError } from "@orpc/server";
 import { RPCHandler } from "@orpc/server/fetch";
 
-import { rpcRouter } from "./router";
+import { appRouter } from "./router";
 
 /**
  * Create RPC handler for Next.js API routes
  *
- * This handler uses standard ORPC (not OpenAPI) for internal admin endpoints.
+ * This handler uses standard ORPC for all endpoints.
  *
  * @returns Handler function for Next.js route
  */
 export function createRpcHandler() {
-    const handler = new RPCHandler(rpcRouter, {
+    const handler = new RPCHandler(appRouter, {
         interceptors: [
             onError((error) => {
-                console.error("[Admin RPC Error]", error);
+                console.error("[RPC Error]", error);
             }),
         ],
     });
 
     return async (request: Request) => {
         const { matched, response } = await handler.handle(request, {
-            prefix: "/api/admin",
+            prefix: "/api/rpc",
             context: {},
         });
 

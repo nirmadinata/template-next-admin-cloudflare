@@ -1,10 +1,10 @@
-import { createRpcHandler } from "@/features/rpc";
+import { createRpcHandler } from "@/integrations/rpc";
 
 /**
- * Admin RPC Route Handler
+ * RPC Route Handler
  *
- * Handles all admin-related RPC endpoints.
- * Prefix: /api/admin
+ * Handles all RPC endpoints.
+ * Prefix: /api/rpc
  */
 const handler = createRpcHandler();
 
