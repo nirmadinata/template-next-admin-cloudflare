@@ -1,9 +1,8 @@
 import type { TestimonialItemType } from "@/features/visitor-home/server/schemas";
 
+import { Text } from "../atoms";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
-
-import { Text } from "../atoms";
 
 interface TestimonialCardProps {
     testimonial: TestimonialItemType;

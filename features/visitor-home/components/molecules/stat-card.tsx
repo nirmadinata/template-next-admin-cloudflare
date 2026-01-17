@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-
 import type { StatItemType } from "@/features/visitor-home/server/schemas";
+
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Heading, Text } from "../atoms";
 
@@ -37,29 +37,7 @@ export function StatCard({
     const [hasAnimated, setHasAnimated] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        if (!animate || hasAnimated) return;
-
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting && !hasAnimated) {
-                        setHasAnimated(true);
-                        animateValue();
-                    }
-                });
-            },
-            { threshold: 0.5 }
-        );
-
-        if (ref.current) {
-            observer.observe(ref.current);
-        }
-
-        return () => observer.disconnect();
-    }, [animate, hasAnimated]);
-
-    const animateValue = () => {
+    const animateValue = useCallback(() => {
         const numericValue = parseFloat(stat.value.replace(/[^0-9.]/g, ""));
 
         if (isNaN(numericValue)) {
@@ -92,7 +70,29 @@ export function StatCard({
         };
 
         requestAnimationFrame(step);
-    };
+    }, [duration, stat.value]);
+
+    useEffect(() => {
+        if (!animate || hasAnimated) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting && !hasAnimated) {
+                        setHasAnimated(true);
+                        animateValue();
+                    }
+                });
+            },
+            { threshold: 0.5 }
+        );
+
+        if (ref.current) {
+            observer.observe(ref.current);
+        }
+
+        return () => observer.disconnect();
+    }, [animate, animateValue, hasAnimated]);
 
     return (
         <div ref={ref} className="text-center">

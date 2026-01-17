@@ -1,10 +1,9 @@
-import Link from "next/link";
-
 import type { HeroSectionType as HeroSectionType } from "@/features/visitor-home/server/schemas";
 
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 import { Heading, Text } from "../atoms";
+import { Button } from "@/components/ui/button";
 
 interface HeroSectionProps {
     data: HeroSectionType;

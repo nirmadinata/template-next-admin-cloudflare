@@ -1,8 +1,7 @@
 import type { FeatureItemType } from "@/features/visitor-home/server/schemas";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
 import { Icon, Text } from "../atoms";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface FeatureCardProps {
     feature: FeatureItemType;

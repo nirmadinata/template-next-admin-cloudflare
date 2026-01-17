@@ -3,13 +3,13 @@
 import { useQuery } from "@tanstack/react-query";
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { visitorOrpc } from "@/features/visitor-api";
 import {
     FeaturesSection,
     HeroSection,
     StatsSection,
     TestimonialsCarouselSection,
 } from "@/features/visitor-home/components/organisms";
-import { visitorOrpc } from "@/features/visitor-api";
 
 /**
  * Client-Side Home Page Content
